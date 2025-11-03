@@ -1,0 +1,92 @@
+
+.container.data-v-e6e5e79f {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #FFF5F5 0%, #FFE5E5 100%);
+    padding: 40rpx;
+}
+.header.data-v-e6e5e79f {
+    text-align: center;
+    margin-bottom: 60rpx;
+    padding-top: 40rpx;
+}
+.header-title.data-v-e6e5e79f {
+    font-size: 48rpx;
+    font-weight: bold;
+    color: #8B4513;
+    display: block;
+    margin-bottom: 10rpx;
+    letter-spacing: 4rpx;
+}
+.header-subtitle.data-v-e6e5e79f {
+    font-size: 28rpx;
+    color: #D2691E;
+    opacity: 0.8;
+    font-style: italic;
+}
+.schedule-list.data-v-e6e5e79f {
+    position: relative;
+}
+.schedule-item.data-v-e6e5e79f {
+    display: flex;
+    margin-bottom: 40rpx;
+    position: relative;
+}
+.time-line.data-v-e6e5e79f {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 30rpx;
+    position: relative;
+}
+.time-dot.data-v-e6e5e79f {
+    width: 24rpx;
+    height: 24rpx;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FF69B4 0%, #FFB6C1 100%);
+    border: 4rpx solid #fff;
+    box-shadow: 0 4rpx 8rpx rgba(255, 105, 180, 0.3);
+    z-index: 2;
+}
+.time-line-bar.data-v-e6e5e79f {
+    width: 2rpx;
+    flex: 1;
+    background: linear-gradient(180deg, #FFB6C1 0%, transparent 100%);
+    margin-top: 10rpx;
+    min-height: 100rpx;
+}
+.schedule-content.data-v-e6e5e79f {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24rpx;
+    padding: 30rpx;
+    box-shadow: 0 4rpx 12rpx rgba(255, 182, 193, 0.2);
+    margin-bottom: 20rpx;
+}
+.schedule-time.data-v-e6e5e79f {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: #FF69B4;
+    margin-bottom: 10rpx;
+}
+.schedule-title.data-v-e6e5e79f {
+    font-size: 36rpx;
+    font-weight: 600;
+    color: #8B4513;
+    margin-bottom: 15rpx;
+}
+.schedule-desc.data-v-e6e5e79f {
+    font-size: 26rpx;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 10rpx;
+}
+.schedule-location.data-v-e6e5e79f {
+    font-size: 24rpx;
+    color: #999;
+    display: flex;
+    align-items: center;
+    margin-top: 10rpx;
+}
+.location-icon.data-v-e6e5e79f {
+    margin-right: 8rpx;
+}

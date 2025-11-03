@@ -1,0 +1,103 @@
+
+.container.data-v-75a99a67 {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #FFF5F5 0%, #FFE5E5 100%);
+    padding: 40rpx;
+}
+.header.data-v-75a99a67 {
+    text-align: center;
+    margin-bottom: 40rpx;
+    padding-top: 40rpx;
+}
+.header-title.data-v-75a99a67 {
+    font-size: 48rpx;
+    font-weight: bold;
+    color: #8B4513;
+    display: block;
+    margin-bottom: 10rpx;
+    letter-spacing: 4rpx;
+}
+.header-subtitle.data-v-75a99a67 {
+    font-size: 28rpx;
+    color: #D2691E;
+    opacity: 0.8;
+    font-style: italic;
+}
+.input-section.data-v-75a99a67 {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24rpx;
+    padding: 30rpx;
+    margin-bottom: 40rpx;
+    box-shadow: 0 4rpx 12rpx rgba(255, 182, 193, 0.2);
+}
+.textarea.data-v-75a99a67 {
+    width: 100%;
+    min-height: 200rpx;
+    background: #F8F8F8;
+    border-radius: 16rpx;
+    padding: 20rpx;
+    font-size: 28rpx;
+    color: #333;
+    margin-bottom: 20rpx;
+    box-sizing: border-box;
+}
+.input-footer.data-v-75a99a67 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.char-count.data-v-75a99a67 {
+    font-size: 24rpx;
+    color: #999;
+}
+.submit-btn.data-v-75a99a67 {
+    background: linear-gradient(135deg, #FF69B4 0%, #FFB6C1 100%);
+    color: #fff;
+    border: none;
+    border-radius: 40rpx;
+    padding: 16rpx 40rpx;
+    font-size: 28rpx;
+    font-weight: 500;
+}
+.submit-btn.data-v-75a99a67::after {
+    border: none;
+}
+.blessings-list.data-v-75a99a67 {
+    margin-top: 20rpx;
+}
+.blessing-item.data-v-75a99a67 {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24rpx;
+    padding: 30rpx;
+    margin-bottom: 30rpx;
+    box-shadow: 0 4rpx 12rpx rgba(255, 182, 193, 0.2);
+}
+.blessing-header.data-v-75a99a67 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20rpx;
+}
+.blessing-name.data-v-75a99a67 {
+    font-size: 30rpx;
+    font-weight: 600;
+    color: #8B4513;
+}
+.blessing-time.data-v-75a99a67 {
+    font-size: 24rpx;
+    color: #999;
+}
+.blessing-content.data-v-75a99a67 {
+    font-size: 28rpx;
+    color: #666;
+    line-height: 1.8;
+}
+.empty-tip.data-v-75a99a67 {
+    text-align: center;
+    padding: 100rpx 40rpx;
+}
+.empty-text.data-v-75a99a67 {
+    font-size: 28rpx;
+    color: #999;
+    line-height: 1.8;
+}

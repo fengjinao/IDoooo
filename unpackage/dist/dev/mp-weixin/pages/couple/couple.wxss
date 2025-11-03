@@ -1,0 +1,120 @@
+
+.container.data-v-125f9e6c {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #FFF5F5 0%, #FFE5E5 100%);
+    padding: 40rpx;
+}
+.header.data-v-125f9e6c {
+    text-align: center;
+    margin-bottom: 60rpx;
+    padding-top: 40rpx;
+}
+.header-title.data-v-125f9e6c {
+    font-size: 48rpx;
+    font-weight: bold;
+    color: #8B4513;
+    display: block;
+    margin-bottom: 10rpx;
+    letter-spacing: 4rpx;
+}
+.header-subtitle.data-v-125f9e6c {
+    font-size: 28rpx;
+    color: #D2691E;
+    opacity: 0.8;
+    font-style: italic;
+}
+.couple-card.data-v-125f9e6c {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 32rpx;
+    padding: 50rpx 40rpx;
+    margin-bottom: 50rpx;
+    box-shadow: 0 8rpx 24rpx rgba(255, 182, 193, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.groom-card.data-v-125f9e6c {
+    border-left: 6rpx solid #4A90E2;
+}
+.bride-card.data-v-125f9e6c {
+    border-left: 6rpx solid #FF69B4;
+}
+.avatar-wrapper.data-v-125f9e6c {
+    position: relative;
+    margin-bottom: 30rpx;
+}
+.avatar.data-v-125f9e6c {
+    width: 200rpx;
+    height: 200rpx;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFE5E5 0%, #FFD6D6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 100rpx;
+    border: 6rpx solid #FFB6C1;
+}
+.heart-icon.data-v-125f9e6c {
+    position: absolute;
+    top: -10rpx;
+    right: -10rpx;
+    font-size: 40rpx;
+    animation: heartbeat-125f9e6c 1.5s ease-in-out infinite;
+}
+@keyframes heartbeat-125f9e6c {
+0%,
+    100% {
+        transform: scale(1);
+}
+50% {
+        transform: scale(1.2);
+}
+}
+.info-section.data-v-125f9e6c {
+    text-align: center;
+    width: 100%;
+}
+.name.data-v-125f9e6c {
+    font-size: 40rpx;
+    font-weight: bold;
+    color: #8B4513;
+    display: block;
+    margin-bottom: 10rpx;
+}
+.title.data-v-125f9e6c {
+    font-size: 28rpx;
+    color: #D2691E;
+    display: block;
+    margin-bottom: 30rpx;
+}
+.divider.data-v-125f9e6c {
+    width: 100rpx;
+    height: 2rpx;
+    background: linear-gradient(90deg, transparent, #FFB6C1, transparent);
+    margin: 0 auto 30rpx;
+}
+.description.data-v-125f9e6c {
+    font-size: 28rpx;
+    color: #666;
+    line-height: 1.8;
+    display: block;
+}
+.meet-section.data-v-125f9e6c {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 32rpx;
+    padding: 50rpx 40rpx;
+    margin: 50rpx 0;
+    text-align: center;
+    box-shadow: 0 8rpx 24rpx rgba(255, 182, 193, 0.3);
+}
+.meet-icon.data-v-125f9e6c {
+    font-size: 80rpx;
+    margin-bottom: 30rpx;
+}
+.meet-text.data-v-125f9e6c {
+    font-size: 30rpx;
+    color: #8B4513;
+    line-height: 1.8;
+    display: block;
+    font-style: italic;
+}

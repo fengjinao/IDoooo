@@ -1,0 +1,52 @@
+{
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "我们的婚礼",
+				"navigationBarBackgroundColor": "#FFE5E5",
+				"navigationBarTextStyle": "black",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			"path": "pages/couple/couple",
+			"style": {
+				"navigationBarTitleText": "新人介绍",
+				"navigationBarBackgroundColor": "#FFE5E5",
+				"navigationBarTextStyle": "black"
+			}
+		},
+		{
+			"path": "pages/schedule/schedule",
+			"style": {
+				"navigationBarTitleText": "婚礼流程",
+				"navigationBarBackgroundColor": "#FFE5E5",
+				"navigationBarTextStyle": "black"
+			}
+		},
+		{
+			"path": "pages/gallery/gallery",
+			"style": {
+				"navigationBarTitleText": "甜蜜相册",
+				"navigationBarBackgroundColor": "#FFE5E5",
+				"navigationBarTextStyle": "black"
+			}
+		},
+		{
+			"path": "pages/blessing/blessing",
+			"style": {
+				"navigationBarTitleText": "祝福留言",
+				"navigationBarBackgroundColor": "#FFE5E5",
+				"navigationBarTextStyle": "black"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "我们的婚礼",
+		"navigationBarBackgroundColor": "#FFE5E5",
+		"backgroundColor": "#FFF5F5"
+	},
+	"uniIdRouter": {}
+}
