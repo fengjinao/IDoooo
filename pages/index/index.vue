@@ -84,7 +84,8 @@
 					<view class="gallery-item" v-for="(item, index) in column" :key="item.id"
 						:style="{ height: item.height + 'rpx' }" @click="previewImage(item.id)">
 						<view class="image-placeholder" :style="{ height: item.imageHeight + 'rpx' }">
-							<text class="placeholder-text">{{ item.emoji || '📸' }}</text>
+							<image v-if="item.image" :src="item.image" mode="aspectFill" class="photo"></image>
+							<text v-else class="placeholder-text">{{ item.emoji || '📸' }}</text>
 						</view>
 						<view class="image-desc" v-if="item.desc">{{ item.desc }}</view>
 					</view>
@@ -202,7 +203,7 @@ export default {
 			// 相册数据
 			galleryList: [
 				{ emoji: '💕', desc: '初次相遇' },
-				{ emoji: '💑', desc: '第一次约会' },
+				{ emoji: '💑', image: '/static/1.png', desc: '第一次约会' },
 				{ emoji: '🌹', desc: '浪漫时光' },
 				{ emoji: '💍', desc: '求婚时刻' },
 				{ emoji: '📸', desc: '婚纱照' },
@@ -271,6 +272,19 @@ export default {
 		// 页面显示时重新启动倒计时
 		if (!this.timer) {
 			this.startCountdown()
+		}
+	},
+	onShareAppMessage() {
+		return {
+			title: '我们的婚礼，诚邀您见证幸福时刻',
+			path: '/pages/index/index',
+			imageUrl: '/static/1.png'
+		}
+	},
+	onShareTimeline() {
+		return {
+			title: '我们的婚礼，诚邀您见证幸福时刻',
+			imageUrl: '/static/1.png'
 		}
 	},
 	onUnload() {
@@ -824,6 +838,12 @@ export default {
 
 .placeholder-text {
 	font-size: 80rpx;
+}
+
+.photo {
+	width: 100%;
+	height: 100%;
+	display: block;
 }
 
 .image-desc {

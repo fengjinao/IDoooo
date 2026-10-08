@@ -53,6 +53,19 @@ const _sfc_main = {
     common_vendor.index.setNavigationBarTitle({
       title: "婚礼流程"
     });
+  },
+  onShareAppMessage() {
+    return {
+      title: "我们的婚礼，诚邀您见证幸福时刻",
+      path: "/pages/index/index",
+      imageUrl: "/static/1.png"
+    };
+  },
+  onShareTimeline() {
+    return {
+      title: "我们的婚礼，诚邀您见证幸福时刻",
+      imageUrl: "/static/1.png"
+    };
   }
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -77,5 +90,6 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   };
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-e6e5e79f"]]);
+_sfc_main.__runtimeHooks = 6;
 wx.createPage(MiniProgramPage);
 //# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/schedule/schedule.js.map

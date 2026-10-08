@@ -32,7 +32,7 @@ const _sfc_main = {
       // 相册数据
       galleryList: [
         { emoji: "💕", desc: "初次相遇" },
-        { emoji: "💑", desc: "第一次约会" },
+        { emoji: "💑", image: "/static/1.png", desc: "第一次约会" },
         { emoji: "🌹", desc: "浪漫时光" },
         { emoji: "💍", desc: "求婚时刻" },
         { emoji: "📸", desc: "婚纱照" },
@@ -97,6 +97,19 @@ const _sfc_main = {
     if (!this.timer) {
       this.startCountdown();
     }
+  },
+  onShareAppMessage() {
+    return {
+      title: "我们的婚礼，诚邀您见证幸福时刻",
+      path: "/pages/index/index",
+      imageUrl: "/static/1.png"
+    };
+  },
+  onShareTimeline() {
+    return {
+      title: "我们的婚礼，诚邀您见证幸福时刻",
+      imageUrl: "/static/1.png"
+    };
   },
   onUnload() {
     if (this.timer) {
@@ -184,7 +197,7 @@ const _sfc_main = {
           }
         }
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/index/index.vue:377", "加载祝福失败", e);
+        common_vendor.index.__f__("error", "at pages/index/index.vue:391", "加载祝福失败", e);
         this.blessingsList = [];
       }
     },
@@ -194,7 +207,7 @@ const _sfc_main = {
         const dataStr = JSON.stringify(listToSave);
         common_vendor.index.setStorageSync("blessingsList", dataStr);
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/index/index.vue:390", "保存祝福失败", e);
+        common_vendor.index.__f__("error", "at pages/index/index.vue:404", "保存祝福失败", e);
         try {
           common_vendor.index.removeStorageSync("blessingsList");
           if (this.blessingsList.length > 50) {
@@ -203,7 +216,7 @@ const _sfc_main = {
             common_vendor.index.setStorageSync("blessingsList", dataStr);
           }
         } catch (e2) {
-          common_vendor.index.__f__("error", "at pages/index/index.vue:400", "清理存储失败", e2);
+          common_vendor.index.__f__("error", "at pages/index/index.vue:414", "清理存储失败", e2);
         }
       }
     },
@@ -245,7 +258,7 @@ const _sfc_main = {
         const systemInfo = common_vendor.index.getSystemInfoSync();
         rpxToPx = systemInfo.windowWidth / 750;
       } catch (e) {
-        common_vendor.index.__f__("log", "at pages/index/index.vue:450", "获取系统信息失败，使用默认比例");
+        common_vendor.index.__f__("log", "at pages/index/index.vue:464", "获取系统信息失败，使用默认比例");
       }
       this.autoScrollTimer = setInterval(() => {
         if (!this.isAutoScrolling)
@@ -291,15 +304,20 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       return {
         a: common_vendor.f(column, (item, index, i1) => {
           return common_vendor.e({
-            a: common_vendor.t(item.emoji || "📸"),
-            b: item.imageHeight + "rpx",
-            c: item.desc
+            a: item.image
+          }, item.image ? {
+            b: item.image
+          } : {
+            c: common_vendor.t(item.emoji || "📸")
+          }, {
+            d: item.imageHeight + "rpx",
+            e: item.desc
           }, item.desc ? {
-            d: common_vendor.t(item.desc)
+            f: common_vendor.t(item.desc)
           } : {}, {
-            e: item.id,
-            f: item.height + "rpx",
-            g: common_vendor.o(($event) => $options.previewImage(item.id), item.id)
+            g: item.id,
+            h: item.height + "rpx",
+            i: common_vendor.o(($event) => $options.previewImage(item.id), item.id)
           });
         }),
         b: colIndex
@@ -323,9 +341,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       });
     }),
     l: $data.inputMessage,
-    m: common_vendor.o(($event) => $data.inputMessage = $event.detail.value),
+    m: common_vendor.o(($event) => $data.inputMessage = $event.detail.value, "17"),
     n: common_vendor.t($data.inputMessage.length),
-    o: common_vendor.o((...args) => $options.submitBlessing && $options.submitBlessing(...args)),
+    o: common_vendor.o((...args) => $options.submitBlessing && $options.submitBlessing(...args), "1a"),
     p: common_vendor.f($data.blessingsList, (item, index, i0) => {
       return {
         a: common_vendor.t(item.name),
@@ -341,9 +359,10 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, $data.autoScrollEnabled ? {
     t: common_vendor.t($data.isAutoScrolling ? "⏸️" : "▶️"),
     v: common_vendor.t($data.isAutoScrolling ? "暂停" : "自动播放"),
-    w: common_vendor.o((...args) => $options.toggleAutoScroll && $options.toggleAutoScroll(...args))
+    w: common_vendor.o((...args) => $options.toggleAutoScroll && $options.toggleAutoScroll(...args), "5d")
   } : {});
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-1cf27b2a"]]);
+_sfc_main.__runtimeHooks = 6;
 wx.createPage(MiniProgramPage);
 //# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/index/index.js.map

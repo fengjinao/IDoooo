@@ -10,7 +10,8 @@
 				<view class="gallery-item" v-for="(item, index) in column" :key="item.id"
 					:style="{ height: item.height + 'rpx' }" @click="previewImage(item.id)">
 					<view class="image-placeholder" :style="{ height: item.imageHeight + 'rpx' }">
-						<text class="placeholder-text">{{ item.emoji || '📸' }}</text>
+						<image v-if="item.image" :src="item.image" mode="aspectFill" class="photo"></image>
+						<text v-else class="placeholder-text">{{ item.emoji || '📸' }}</text>
 					</view>
 					<view class="image-desc" v-if="item.desc">{{ item.desc }}</view>
 				</view>
@@ -29,6 +30,7 @@
 					},
 					{
 						emoji: '💑',
+						image: '/static/1.png',
 						desc: '第一次约会'
 					},
 					{
@@ -116,6 +118,19 @@
 			})
 			this.initWaterfall()
 		},
+		onShareAppMessage() {
+			return {
+				title: '我们的婚礼，诚邀您见证幸福时刻',
+				path: '/pages/index/index',
+				imageUrl: '/static/1.png'
+			}
+		},
+		onShareTimeline() {
+			return {
+				title: '我们的婚礼，诚邀您见证幸福时刻',
+				imageUrl: '/static/1.png'
+			}
+		},
 		methods: {
 			initWaterfall() {
 				// 为每张图片生成随机高度，模拟真实照片尺寸差异
@@ -148,6 +163,15 @@
 				})
 			},
 			previewImage(id) {
+				const allItems = [...this.waterfallColumns[0], ...this.waterfallColumns[1]]
+				const item = allItems.find(i => i.id === id)
+				if (item && item.image) {
+					uni.previewImage({
+						current: item.image,
+						urls: allItems.filter(i => i.image).map(i => i.image)
+					})
+					return
+				}
 				uni.showToast({
 					title: '点击了第' + (id + 1) + '张照片',
 					icon: 'none'
@@ -226,6 +250,12 @@
 
 	.placeholder-text {
 		font-size: 80rpx;
+	}
+
+	.photo {
+		width: 100%;
+		height: 100%;
+		display: block;
 	}
 
 	.image-desc {

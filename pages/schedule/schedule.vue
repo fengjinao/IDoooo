@@ -79,6 +79,19 @@ export default {
         uni.setNavigationBarTitle({
             title: '婚礼流程'
         })
+    },
+    onShareAppMessage() {
+        return {
+            title: '我们的婚礼，诚邀您见证幸福时刻',
+            path: '/pages/index/index',
+            imageUrl: '/static/1.png'
+        }
+    },
+    onShareTimeline() {
+        return {
+            title: '我们的婚礼，诚邀您见证幸福时刻',
+            imageUrl: '/static/1.png'
+        }
     }
 }
 </script>

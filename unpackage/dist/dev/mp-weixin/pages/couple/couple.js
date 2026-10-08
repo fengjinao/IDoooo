@@ -18,6 +18,19 @@ const _sfc_main = {
     common_vendor.index.setNavigationBarTitle({
       title: "新人介绍"
     });
+  },
+  onShareAppMessage() {
+    return {
+      title: "我们的婚礼，诚邀您见证幸福时刻",
+      path: "/pages/index/index",
+      imageUrl: "/static/1.png"
+    };
+  },
+  onShareTimeline() {
+    return {
+      title: "我们的婚礼，诚邀您见证幸福时刻",
+      imageUrl: "/static/1.png"
+    };
   }
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -30,5 +43,6 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   };
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-125f9e6c"]]);
+_sfc_main.__runtimeHooks = 6;
 wx.createPage(MiniProgramPage);
 //# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/couple/couple.js.map

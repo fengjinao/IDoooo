@@ -24,6 +24,19 @@ const _sfc_main = {
     });
     this.loadBlessings();
   },
+  onShareAppMessage() {
+    return {
+      title: "我们的婚礼，诚邀您见证幸福时刻",
+      path: "/pages/index/index",
+      imageUrl: "/static/1.png"
+    };
+  },
+  onShareTimeline() {
+    return {
+      title: "我们的婚礼，诚邀您见证幸福时刻",
+      imageUrl: "/static/1.png"
+    };
+  },
   methods: {
     loadBlessings() {
       try {
@@ -35,7 +48,7 @@ const _sfc_main = {
           }
         }
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/blessing/blessing.vue:73", "加载祝福失败", e);
+        common_vendor.index.__f__("error", "at pages/blessing/blessing.vue:86", "加载祝福失败", e);
         this.blessingsList = [];
       }
     },
@@ -45,7 +58,7 @@ const _sfc_main = {
         const dataStr = JSON.stringify(listToSave);
         common_vendor.index.setStorageSync("blessingsList", dataStr);
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/blessing/blessing.vue:86", "保存祝福失败", e);
+        common_vendor.index.__f__("error", "at pages/blessing/blessing.vue:99", "保存祝福失败", e);
         try {
           common_vendor.index.removeStorageSync("blessingsList");
           if (this.blessingsList.length > 50) {
@@ -54,7 +67,7 @@ const _sfc_main = {
             common_vendor.index.setStorageSync("blessingsList", dataStr);
           }
         } catch (e2) {
-          common_vendor.index.__f__("error", "at pages/blessing/blessing.vue:96", "清理存储失败", e2);
+          common_vendor.index.__f__("error", "at pages/blessing/blessing.vue:109", "清理存储失败", e2);
         }
       }
     },
@@ -89,9 +102,9 @@ const _sfc_main = {
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: $data.inputMessage,
-    b: common_vendor.o(($event) => $data.inputMessage = $event.detail.value),
+    b: common_vendor.o(($event) => $data.inputMessage = $event.detail.value, "26"),
     c: common_vendor.t($data.inputMessage.length),
-    d: common_vendor.o((...args) => $options.submitBlessing && $options.submitBlessing(...args)),
+    d: common_vendor.o((...args) => $options.submitBlessing && $options.submitBlessing(...args), "38"),
     e: common_vendor.f($data.blessingsList, (item, index, i0) => {
       return {
         a: common_vendor.t(item.name),
@@ -104,5 +117,6 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, $data.blessingsList.length === 0 ? {} : {});
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-75a99a67"]]);
+_sfc_main.__runtimeHooks = 6;
 wx.createPage(MiniProgramPage);
 //# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/blessing/blessing.js.map

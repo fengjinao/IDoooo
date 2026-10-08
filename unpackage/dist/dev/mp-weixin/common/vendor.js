@@ -171,12 +171,16 @@ const ON_ERROR = "onError";
 const ON_THEME_CHANGE = "onThemeChange";
 const ON_PAGE_NOT_FOUND = "onPageNotFound";
 const ON_UNHANDLE_REJECTION = "onUnhandledRejection";
+const ON_LAST_PAGE_BACK_PRESS = "onLastPageBackPress";
 const ON_EXIT = "onExit";
 const ON_LOAD = "onLoad";
 const ON_READY = "onReady";
 const ON_UNLOAD = "onUnload";
 const ON_INIT = "onInit";
 const ON_SAVE_EXIT_STATE = "onSaveExitState";
+const ON_UPLOAD_DOUYIN_VIDEO = "onUploadDouyinVideo";
+const ON_LIVE_MOUNT = "onLiveMount";
+const ON_TITLE_CLICK = "onTitleClick";
 const ON_RESIZE = "onResize";
 const ON_BACK_PRESS = "onBackPress";
 const ON_PAGE_SCROLL = "onPageScroll";
@@ -185,6 +189,7 @@ const ON_REACH_BOTTOM = "onReachBottom";
 const ON_PULL_DOWN_REFRESH = "onPullDownRefresh";
 const ON_SHARE_TIMELINE = "onShareTimeline";
 const ON_SHARE_CHAT = "onShareChat";
+const ON_COPY_URL = "onCopyUrl";
 const ON_ADD_TO_FAVORITES = "onAddToFavorites";
 const ON_SHARE_APP_MESSAGE = "onShareAppMessage";
 const ON_NAVIGATION_BAR_BUTTON_TAP = "onNavigationBarButtonTap";
@@ -196,6 +201,10 @@ const VIRTUAL_HOST_STYLE = "virtualHostStyle";
 const VIRTUAL_HOST_CLASS = "virtualHostClass";
 const VIRTUAL_HOST_HIDDEN = "virtualHostHidden";
 const VIRTUAL_HOST_ID = "virtualHostId";
+const customizeRE = /:/g;
+function customizeEvent(str) {
+  return camelize(str.replace(customizeRE, "-"));
+}
 function hasLeadingSlash(str) {
   return str.indexOf("/") === 0;
 }
@@ -234,20 +243,6 @@ function getValueByDataPath(obj, path) {
   }
   return getValueByDataPath(obj[key], parts.slice(1).join("."));
 }
-function sortObject(obj) {
-  let sortObj = {};
-  if (isPlainObject(obj)) {
-    Object.keys(obj).sort().forEach((key) => {
-      const _key = key;
-      sortObj[_key] = obj[_key];
-    });
-  }
-  return !Object.keys(sortObj) ? obj : sortObj;
-}
-const customizeRE = /:/g;
-function customizeEvent(str) {
-  return camelize(str.replace(customizeRE, "-"));
-}
 const encode = encodeURIComponent;
 function stringifyQuery(obj, encodeStr = encode) {
   const res = obj ? Object.keys(obj).map((key) => {
@@ -267,6 +262,7 @@ const PAGE_HOOKS = [
   ON_SHOW,
   ON_HIDE,
   ON_UNLOAD,
+  ON_RESIZE,
   ON_BACK_PRESS,
   ON_PAGE_SCROLL,
   ON_TAB_ITEM_TAP,
@@ -275,6 +271,10 @@ const PAGE_HOOKS = [
   ON_SHARE_TIMELINE,
   ON_SHARE_APP_MESSAGE,
   ON_SHARE_CHAT,
+  ON_COPY_URL,
+  ON_UPLOAD_DOUYIN_VIDEO,
+  ON_LIVE_MOUNT,
+  ON_TITLE_CLICK,
   ON_ADD_TO_FAVORITES,
   ON_SAVE_EXIT_STATE,
   ON_NAVIGATION_BAR_BUTTON_TAP,
@@ -309,18 +309,28 @@ const UniLifecycleHooks = [
   ON_ADD_TO_FAVORITES,
   ON_SHARE_APP_MESSAGE,
   ON_SHARE_CHAT,
+  ON_COPY_URL,
+  ON_UPLOAD_DOUYIN_VIDEO,
+  ON_LIVE_MOUNT,
+  ON_TITLE_CLICK,
   ON_SAVE_EXIT_STATE,
   ON_NAVIGATION_BAR_BUTTON_TAP,
   ON_NAVIGATION_BAR_SEARCH_INPUT_CLICKED,
   ON_NAVIGATION_BAR_SEARCH_INPUT_CHANGED,
   ON_NAVIGATION_BAR_SEARCH_INPUT_CONFIRMED,
-  ON_NAVIGATION_BAR_SEARCH_INPUT_FOCUS_CHANGED
+  ON_NAVIGATION_BAR_SEARCH_INPUT_FOCUS_CHANGED,
+  ON_LAST_PAGE_BACK_PRESS
 ];
 const MINI_PROGRAM_PAGE_RUNTIME_HOOKS = /* @__PURE__ */ (() => {
   return {
     onPageScroll: 1,
     onShareAppMessage: 1 << 1,
-    onShareTimeline: 1 << 2
+    onShareTimeline: 1 << 2,
+    onShareChat: 1 << 3,
+    onCopyUrl: 1 << 4,
+    onUploadDouyinVideo: 1 << 5,
+    onLiveMount: 1 << 6,
+    onTitleClick: 1 << 7
   };
 })();
 function isUniLifecycleHook(name, value, checkType = true) {
@@ -2665,6 +2675,8 @@ const PublicInstanceProxyHandlers = {
     } else if (ctx !== EMPTY_OBJ && hasOwn(ctx, key)) {
       accessCache[key] = 4;
       return ctx[key];
+    } else if (instance.exposed && hasOwn(instance.exposed, key)) {
+      return instance.exposed[key];
     } else if (
       // global properties
       globalProperties = appContext.config.globalProperties, hasOwn(globalProperties, key)
@@ -3284,7 +3296,7 @@ function updateProps(instance, rawProps, rawPrevProps, optimized) {
         if (options) {
           if (hasOwn(attrs, key)) {
             if (value !== attrs[key]) {
-              attrs[key] = value;
+              attrs[key] = normalizeInheritAttrsValue(instance, key, value);
               hasAttrsChanged = true;
             }
           } else {
@@ -3300,7 +3312,7 @@ function updateProps(instance, rawProps, rawPrevProps, optimized) {
           }
         } else {
           if (value !== attrs[key]) {
-            attrs[key] = value;
+            attrs[key] = normalizeInheritAttrsValue(instance, key, value);
             hasAttrsChanged = true;
           }
         }
@@ -3363,13 +3375,15 @@ function setFullProps(instance, rawProps, props, attrs) {
       let camelKey;
       if (options && hasOwn(options, camelKey = camelize(key))) {
         if (!needCastKeys || !needCastKeys.includes(camelKey)) {
-          props[camelKey] = value;
+          {
+            props[camelKey] = value;
+          }
         } else {
           (rawCastValues || (rawCastValues = {}))[camelKey] = value;
         }
       } else if (!isEmitListener(instance.emitsOptions, key)) {
         if (!(key in attrs) || value !== attrs[key]) {
-          attrs[key] = value;
+          attrs[key] = normalizeInheritAttrsValue(instance, key, value);
           hasAttrsChanged = true;
         }
       }
@@ -3392,7 +3406,21 @@ function setFullProps(instance, rawProps, props, attrs) {
   }
   return hasAttrsChanged;
 }
+function normalizeInheritAttrsValue(instance, key, value) {
+  return value;
+}
 function resolvePropValue$1(options, props, key, value, instance, isAbsent) {
+  const result = _resolvePropValue(
+    options,
+    props,
+    key,
+    value,
+    instance,
+    isAbsent
+  );
+  return result;
+}
+function _resolvePropValue(options, props, key, value, instance, isAbsent) {
   const opt = options[key];
   if (opt != null) {
     const hasDefault = hasOwn(opt, "default");
@@ -4322,16 +4350,15 @@ function setRef$1(instance, isUnmount = false) {
     $templateUniElementRefs,
     ctx: { $scope, $mpPlatform }
   } = instance;
-  if ($mpPlatform === "mp-alipay") {
-    return;
-  }
   if (!$scope || !$templateRefs && !$templateUniElementRefs) {
     return;
   }
   if (isUnmount) {
-    $templateRefs && $templateRefs.forEach(
-      (templateRef) => setTemplateRef(templateRef, null, setupState)
-    );
+    if ($mpPlatform !== "mp-alipay") {
+      $templateRefs && $templateRefs.forEach(
+        (templateRef) => setTemplateRef(templateRef, null, setupState)
+      );
+    }
     $templateUniElementRefs && $templateUniElementRefs.forEach(
       (templateRef) => setTemplateRef(templateRef, null, setupState)
     );
@@ -4368,6 +4395,13 @@ function setRef$1(instance, isUnmount = false) {
       }
     }
   };
+  if ($mpPlatform !== "mp-alipay") {
+    if ($scope._$setRef) {
+      $scope._$setRef(doSet);
+    } else {
+      nextTick(instance, doSet);
+    }
+  }
   if ($templateUniElementRefs && $templateUniElementRefs.length) {
     nextTick(instance, () => {
       $templateUniElementRefs.forEach((templateRef) => {
@@ -4380,11 +4414,6 @@ function setRef$1(instance, isUnmount = false) {
         }
       });
     });
-  }
-  if ($scope._$setRef) {
-    $scope._$setRef(doSet);
-  } else {
-    nextTick(instance, doSet);
   }
 }
 function toSkip(value) {
@@ -4493,6 +4522,18 @@ const getFunctionalFallthrough = (attrs) => {
   }
   return res;
 };
+function clearTemplateRefs(templateRefs) {
+  if (!templateRefs) {
+    return [];
+  }
+  return templateRefs.filter((templateRef) => {
+    const v = templateRef.v;
+    if (v && typeof v === "object" && ["UNI-LOADING-ELEMENT", "UNI-CLOUD-DB-ELEMENT"].includes(v.nodeName)) {
+      return true;
+    }
+    return false;
+  });
+}
 function renderComponentRoot(instance) {
   const {
     type: Component2,
@@ -4520,8 +4561,12 @@ function renderComponentRoot(instance) {
     inheritAttrs
   } = instance;
   instance.$uniElementIds = /* @__PURE__ */ new Map();
-  instance.$templateRefs = [];
-  instance.$templateUniElementRefs = [];
+  instance.$templateRefs = clearTemplateRefs(
+    instance.$templateRefs || []
+  );
+  instance.$templateUniElementRefs = clearTemplateRefs(
+    instance.$templateUniElementRefs || []
+  );
   instance.$templateUniElementStyles = {};
   instance.$ei = 0;
   pruneComponentPropsCache2(uid2);
@@ -4946,9 +4991,11 @@ var plugin = {
     initApp(app);
     app.config.globalProperties.pruneComponentPropsCache = pruneComponentPropsCache;
     const oldMount = app.mount;
-    app.mount = function mount(rootContainer) {
-      const instance = oldMount.call(app, rootContainer);
-      const createApp2 = getCreateApp();
+    app.mount = function mount(rootContainer, subpackageRoot, options) {
+      const hasSubpackageRoot = typeof subpackageRoot === "string";
+      const root = hasSubpackageRoot ? subpackageRoot : void 0;
+      const instance = hasSubpackageRoot ? oldMount.call(app, rootContainer) : oldMount.apply(app, arguments);
+      const createApp2 = getCreateApp(root, options);
       if (createApp2) {
         createApp2(instance);
       } else {
@@ -4960,13 +5007,24 @@ var plugin = {
     };
   }
 };
-function getCreateApp() {
-  const method = "createApp";
+function getCreateApp(subpackageRoot, options) {
+  const root = normalizeSubpackageRoot$1(subpackageRoot);
+  const method = root && (options === null || options === void 0 ? void 0 : options.independent) ? "createIndependentSubpackageApp" : root || "" ? "createSubpackageApp" : "createApp";
+  const createApp2 = method === "createIndependentSubpackageApp" && (options === null || options === void 0 ? void 0 : options.createApp) ? options.createApp : getGlobalCreateApp(method);
+  if (createApp2 && root && (method === "createSubpackageApp" || method === "createIndependentSubpackageApp")) {
+    return (instance) => createApp2(instance, root);
+  }
+  return createApp2;
+}
+function getGlobalCreateApp(method) {
   if (typeof global !== "undefined" && typeof global[method] !== "undefined") {
     return global[method];
   } else if (typeof my !== "undefined") {
     return my[method];
   }
+}
+function normalizeSubpackageRoot$1(root) {
+  return typeof root === "string" ? root.replace(/^\/+|\/+$/g, "") : void 0;
 }
 function vOn(value, key) {
   const instance = getCurrentInstance();
@@ -5032,6 +5090,8 @@ const bubbles = [
 ];
 function patchMPEvent(event, instance) {
   if (event.type && event.target) {
+    event.target;
+    event.currentTarget;
     event.preventDefault = NOOP;
     event.stopPropagation = NOOP;
     event.stopImmediatePropagation = NOOP;
@@ -5980,14 +6040,18 @@ function getOSInfo(system, platform) {
   if (platform && false) {
     osName = platform;
     osVersion = system;
+    system = `${osName} ${osVersion}`;
   } else {
-    osName = system.split(" ")[0] || platform;
+    {
+      osName = platform;
+    }
     osVersion = system.split(" ")[1] || "";
   }
   osName = osName.toLowerCase();
   switch (osName) {
     case "harmony":
     case "ohos":
+    case "openharmonyos":
     case "openharmony":
       osName = "harmonyos";
       break;
@@ -6004,12 +6068,22 @@ function getOSInfo(system, platform) {
   }
   return {
     osName,
-    osVersion
+    osVersion,
+    system
   };
+}
+function getPlatform(platform) {
+  platform = platform.toLowerCase();
+  {
+    if (platform === "ohos") {
+      platform = "harmonyos";
+    }
+  }
+  return platform;
 }
 function populateParameters(fromRes, toRes) {
   const { brand = "", model = "", system = "", language = "", theme, version: version2, platform, fontSizeSetting, SDKVersion, pixelRatio, deviceOrientation } = fromRes;
-  const { osName, osVersion } = getOSInfo(system, platform);
+  const { osName, osVersion, system: updatedSystem } = getOSInfo(system, platform);
   let hostVersion = version2;
   let deviceType = getGetDeviceType(fromRes, model);
   let deviceBrand = getDeviceBrand(brand);
@@ -6024,9 +6098,9 @@ function populateParameters(fromRes, toRes) {
     appVersion: "1.0.0",
     appVersionCode: "100",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "4.75",
-    uniCompilerVersion: "4.75",
-    uniRuntimeVersion: "4.75",
+    uniCompileVersion: "5.24",
+    uniCompilerVersion: "5.24",
+    uniRuntimeVersion: "5.24",
     uniPlatform: "mp-weixin",
     deviceBrand,
     deviceModel: model,
@@ -6043,6 +6117,8 @@ function populateParameters(fromRes, toRes) {
     hostFontSizeSetting: fontSizeSetting,
     windowTop: 0,
     windowBottom: 0,
+    platform: getPlatform(platform),
+    system: updatedSystem,
     // TODO
     osLanguage: void 0,
     osTheme: void 0,
@@ -6055,12 +6131,15 @@ function populateParameters(fromRes, toRes) {
   extend(toRes, parameters);
 }
 function getGetDeviceType(fromRes, model) {
+  const platform = fromRes.platform || "";
   let deviceType = fromRes.deviceType || "phone";
   {
     const deviceTypeMaps = {
       ipad: "pad",
       windows: "pc",
-      mac: "pc"
+      mac: "pc",
+      linux: "pc",
+      pc: "pc"
     };
     const deviceTypeMapsKeys = Object.keys(deviceTypeMaps);
     const _model = model.toLowerCase();
@@ -6070,6 +6149,11 @@ function getGetDeviceType(fromRes, model) {
         deviceType = deviceTypeMaps[_m];
         break;
       }
+    }
+  }
+  {
+    if (platform === "ohos_pc") {
+      deviceType = "pc";
     }
   }
   return deviceType;
@@ -6148,13 +6232,14 @@ const getDeviceInfo = {
     let deviceBrand = getDeviceBrand(brand);
     useDeviceId()(fromRes, toRes);
     const { osName, osVersion } = getOSInfo(system, platform);
-    toRes = sortObject(extend(toRes, {
+    toRes = extend(toRes, {
       deviceType,
       deviceBrand,
       deviceModel: model,
       osName,
-      osVersion
-    }));
+      osVersion,
+      platform: getPlatform(platform)
+    });
   }
 };
 const getAppBaseInfo = {
@@ -6163,32 +6248,38 @@ const getAppBaseInfo = {
     let _hostName = getHostName(fromRes);
     let hostLanguage = (language || "").replace(/_/g, "-");
     const parameters = {
-      hostVersion: version2,
-      hostLanguage,
-      hostName: _hostName,
-      hostSDKVersion: SDKVersion,
-      hostTheme: theme,
       appId: "",
       appName: "我们的婚礼",
       appVersion: "1.0.0",
       appVersionCode: "100",
       appLanguage: getAppLanguage(hostLanguage),
+      hostVersion: version2,
+      hostLanguage,
+      hostName: _hostName,
+      hostSDKVersion: SDKVersion,
+      hostTheme: theme,
       isUniAppX: false,
       uniPlatform: "mp-weixin",
-      uniCompileVersion: "4.75",
-      uniCompilerVersion: "4.75",
-      uniRuntimeVersion: "4.75"
+      uniCompileVersion: "5.24",
+      uniCompilerVersion: "5.24",
+      uniRuntimeVersion: "5.24"
     };
+    try {
+      if (typeof wx.getAccountInfoSync === "function") {
+        parameters.packagename = wx.getAccountInfoSync().miniProgram.appId;
+      }
+    } catch (error) {
+    }
     extend(toRes, parameters);
   }
 };
 const getWindowInfo = {
   returnValue: (fromRes, toRes) => {
     addSafeAreaInsets(fromRes, toRes);
-    toRes = sortObject(extend(toRes, {
+    toRes = extend(toRes, {
       windowTop: 0,
       windowBottom: 0
-    }));
+    });
   }
 };
 const getAppAuthorizeSetting = {
@@ -6270,6 +6361,9 @@ const baseApis = {
   invokePushCallback,
   __f__
 };
+function normalizeApi(name, api) {
+  return api;
+}
 function initUni(api, protocols2, platform = wx) {
   const wrapper = initWrapper(protocols2);
   const UniProxyHandlers = {
@@ -6278,12 +6372,12 @@ function initUni(api, protocols2, platform = wx) {
         return target[key];
       }
       if (hasOwn(api, key)) {
-        return promisify(key, api[key]);
+        return normalizeApi(key, promisify(key, api[key]));
       }
       if (hasOwn(baseApis, key)) {
-        return promisify(key, baseApis[key]);
+        return normalizeApi(key, promisify(key, baseApis[key]));
       }
-      return promisify(key, wrapper(key, platform[key]));
+      return normalizeApi(key, promisify(key, wrapper(key, platform[key])));
     }
   };
   return new Proxy({}, UniProxyHandlers);
@@ -6365,13 +6459,13 @@ function createSelectorQuery() {
   return query;
 }
 const wx$2 = initWx();
-if (!wx$2.canIUse("getAppBaseInfo")) {
+if (!wx$2.getAppBaseInfo || !wx$2.getAppBaseInfo()) {
   wx$2.getAppBaseInfo = wx$2.getSystemInfoSync;
 }
-if (!wx$2.canIUse("getWindowInfo")) {
+if (!wx$2.getWindowInfo || !wx$2.getWindowInfo()) {
   wx$2.getWindowInfo = wx$2.getSystemInfoSync;
 }
-if (!wx$2.canIUse("getDeviceInfo")) {
+if (!wx$2.getDeviceInfo || !wx$2.getDeviceInfo()) {
   wx$2.getDeviceInfo = wx$2.getSystemInfoSync;
 }
 let baseInfo = wx$2.getAppBaseInfo && wx$2.getAppBaseInfo();
@@ -6415,6 +6509,31 @@ var protocols = /* @__PURE__ */ Object.freeze({
 });
 const wx$1 = initWx();
 var index = initUni(shims, protocols, wx$1);
+function currentPageCaptureScreenshot(fullPage, callback) {
+  var _a;
+  const pages = getCurrentPages();
+  const currentPage = pages[pages.length - 1];
+  (_a = currentPage.vm) === null || _a === void 0 ? void 0 : _a.$viewToTempFilePath({
+    wholeContent: fullPage,
+    overwrite: true,
+    success: (res) => {
+      const fileManager = index.getFileSystemManager();
+      fileManager.readFile({
+        encoding: "base64",
+        filePath: res.tempFilePath,
+        success(readFileRes) {
+          callback(readFileRes.data, "");
+        },
+        fail(err) {
+          callback("", `captureScreenshot fail: ${JSON.stringify(err)}`);
+        }
+      });
+    },
+    fail: (err) => {
+      callback("", `captureScreenshot fail: ${JSON.stringify(err)}`);
+    }
+  });
+}
 function initRuntimeSocket(hosts, port, id) {
   if (hosts == "" || port == "" || id == "")
     return Promise.resolve(null);
@@ -6454,6 +6573,22 @@ function tryConnectSocket(host2, port, id) {
     });
     socket.onError((e2) => {
       clearTimeout(timer);
+      resolve(null);
+    });
+    socket.onMessage((result) => {
+      const message = JSON.parse(result.data);
+      if (message["type"] == "screencap") {
+        const id2 = message["id"];
+        currentPageCaptureScreenshot(message.fullPage, (base64, error) => {
+          socket.send({
+            data: JSON.stringify({
+              id: id2,
+              base64,
+              error
+            })
+          });
+        });
+      }
       resolve(null);
     });
   });
@@ -6528,18 +6663,22 @@ function initOnError() {
       originalConsole.error(err);
     }
   }
-  if (typeof index.onError === "function") {
-    index.onError(onError2);
-  }
-  if (typeof index.onUnhandledRejection === "function") {
-    index.onUnhandledRejection(onError2);
+  if (typeof index !== "undefined") {
+    if (typeof index.onError === "function") {
+      index.onError(onError2);
+    }
+    if (typeof index.onUnhandledRejection === "function") {
+      index.onUnhandledRejection(onError2);
+    }
   }
   return function offError2() {
-    if (typeof index.offError === "function") {
-      index.offError(onError2);
-    }
-    if (typeof index.offUnhandledRejection === "function") {
-      index.offUnhandledRejection(onError2);
+    if (typeof index !== "undefined") {
+      if (typeof index.offError === "function") {
+        index.offError(onError2);
+      }
+      if (typeof index.offUnhandledRejection === "function") {
+        index.offUnhandledRejection(onError2);
+      }
     }
   };
 }
@@ -6916,10 +7055,34 @@ function isConsoleWritable() {
   console.log = value;
   return isWritable;
 }
+const UNI_CONSOLE_RUNTIME_PROMISE = "__uni_console_runtime_promise__";
 function initRuntimeSocketService() {
-  const hosts = "192.168.1.136,127.0.0.1";
+  const hosts = "198.18.0.1,172.16.1.82,127.0.0.1";
   const port = "8090";
-  const id = "mp-weixin_fYyKuZ";
+  const id = "mp-weixin_Y4zYOW";
+  const runtimeGlobal = getRuntimeGlobal();
+  const existingPromise = runtimeGlobal === null || runtimeGlobal === void 0 ? void 0 : runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE];
+  if (existingPromise) {
+    return existingPromise;
+  }
+  let runtimePromise = initRuntimeSocketServiceOnce(hosts, port, id);
+  if (runtimeGlobal) {
+    runtimePromise = runtimePromise.then((success) => {
+      if (!success && runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE] === runtimePromise) {
+        delete runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE];
+      }
+      return success;
+    }, (error) => {
+      if (runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE] === runtimePromise) {
+        delete runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE];
+      }
+      throw error;
+    });
+    runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE] = runtimePromise;
+  }
+  return runtimePromise;
+}
+function initRuntimeSocketServiceOnce(hosts, port, id) {
   const lazy = typeof swan !== "undefined";
   let restoreError = lazy ? () => {
   } : initOnError();
@@ -6969,27 +7132,42 @@ const ERROR_CHAR = "‌";
 function wrapError(error) {
   return `${ERROR_CHAR}${error}${ERROR_CHAR}`;
 }
-function initMiniProgramGlobalFlag() {
+function getRuntimeGlobal() {
+  const miniProgramGlobal = getMiniProgramGlobal();
+  if (miniProgramGlobal) {
+    return miniProgramGlobal;
+  }
+  if (typeof globalThis !== "undefined") {
+    return globalThis;
+  }
+}
+function getMiniProgramGlobal() {
   if (typeof wx$1 !== "undefined") {
-    wx$1.__uni_console__ = true;
+    return wx$1;
   } else if (typeof my !== "undefined") {
-    my.__uni_console__ = true;
+    return my;
   } else if (typeof tt !== "undefined") {
-    tt.__uni_console__ = true;
+    return tt;
   } else if (typeof swan !== "undefined") {
-    swan.__uni_console__ = true;
+    return swan;
   } else if (typeof qq !== "undefined") {
-    qq.__uni_console__ = true;
+    return qq;
   } else if (typeof ks !== "undefined") {
-    ks.__uni_console__ = true;
+    return ks;
   } else if (typeof jd !== "undefined") {
-    jd.__uni_console__ = true;
+    return jd;
   } else if (typeof xhs !== "undefined") {
-    xhs.__uni_console__ = true;
+    return xhs;
   } else if (typeof has !== "undefined") {
-    has.__uni_console__ = true;
+    return has;
   } else if (typeof qa !== "undefined") {
-    qa.__uni_console__ = true;
+    return qa;
+  }
+}
+function initMiniProgramGlobalFlag() {
+  const miniProgramGlobal = getMiniProgramGlobal();
+  if (miniProgramGlobal) {
+    miniProgramGlobal.__uni_console__ = true;
   }
 }
 initRuntimeSocketService();
@@ -7270,6 +7448,45 @@ const findMixinRuntimeHooks = /* @__PURE__ */ once(() => {
 function initMixinRuntimeHooks(mpOptions) {
   initHooks(mpOptions, findMixinRuntimeHooks());
 }
+let runtimeSubpackageRoot;
+const runtimeSubpackages = /* @__PURE__ */ Object.create(null);
+function resolveSubpackageRoot(root) {
+  return normalizeSubpackageRoot(root) || normalizeSubpackageRoot("");
+}
+function setRuntimeSubpackageRoot(root) {
+  runtimeSubpackageRoot = normalizeSubpackageRoot(root);
+}
+function getRuntimeSubpackageRoot() {
+  return runtimeSubpackageRoot;
+}
+function setSubpackageAppVm(root, vm, independent) {
+  const subpackageRoot = normalizeSubpackageRoot(root);
+  if (!subpackageRoot) {
+    return;
+  }
+  setRuntimeSubpackageRoot(subpackageRoot);
+  if (independent) {
+    runtimeSubpackages[subpackageRoot] = {
+      $vm: vm
+    };
+  } else {
+    const globalObject = wx;
+    (globalObject.$subpackages || (globalObject.$subpackages = {}))[subpackageRoot] = {
+      $vm: vm
+    };
+  }
+}
+function getSubpackageAppVm() {
+  var _a, _b, _c;
+  const subpackageRoot = getRuntimeSubpackageRoot();
+  if (!subpackageRoot) {
+    return;
+  }
+  return ((_a = runtimeSubpackages[subpackageRoot]) === null || _a === void 0 ? void 0 : _a.$vm) || ((_c = (_b = wx.$subpackages) === null || _b === void 0 ? void 0 : _b[subpackageRoot]) === null || _c === void 0 ? void 0 : _c.$vm);
+}
+function normalizeSubpackageRoot(root) {
+  return typeof root === "string" ? root.replace(/^\/+|\/+$/g, "") : void 0;
+}
 const HOOKS = [
   ON_SHOW,
   ON_HIDE,
@@ -7322,7 +7539,7 @@ function initCreateApp(parseAppOptions) {
   };
 }
 function initCreateSubpackageApp(parseAppOptions) {
-  return function createApp2(vm) {
+  return function createApp2(vm, root) {
     const appOptions = parseApp(vm);
     const app = isFunction(getApp) && getApp({
       allowDefault: true
@@ -7344,6 +7561,12 @@ function initCreateSubpackageApp(parseAppOptions) {
       }
     });
     initAppLifecycle(appOptions, vm);
+    setSubpackageAppVm(resolveSubpackageRoot(root), vm);
+  };
+}
+function initCreateIndependentSubpackageApp() {
+  return function createApp2(vm, root) {
+    setSubpackageAppVm(resolveSubpackageRoot(root), vm, true);
   };
 }
 function initAppLifecycle(appOptions, vm) {
@@ -7548,7 +7771,8 @@ function initPropsObserver(componentOptions) {
       updateComponentProps(resolvePropValue(up), this.$vm.$);
     } else if (resolvePropValue(this.properties.uT) === "m") {
       updateMiniProgramComponentProperties(resolvePropValue(up), this);
-    }
+    } else
+      ;
   };
   {
     if (!componentOptions.observers) {
@@ -7681,21 +7905,44 @@ function initCreateComponent(parseOptions2) {
 }
 let $createComponentFn;
 let $destroyComponentFn;
+let $createComponentAppVm;
+let $destroyComponentAppVm;
+const componentAppVmMap = /* @__PURE__ */ new WeakMap();
 function getAppVm() {
+  const subpackageAppVm = getSubpackageAppVm();
+  if (subpackageAppVm) {
+    return subpackageAppVm;
+  }
   return getApp().$vm;
 }
 function $createComponent(initialVNode, options) {
-  if (!$createComponentFn) {
-    $createComponentFn = getAppVm().$createComponent;
+  const appVm = getAppVm();
+  if (!$createComponentFn || $createComponentAppVm !== appVm) {
+    $createComponentAppVm = appVm;
+    $createComponentFn = appVm.$createComponent;
   }
   const proxy = $createComponentFn(initialVNode, options);
-  return getExposeProxy(proxy.$) || proxy;
+  const exposeProxy = getComponentExposeProxy(proxy);
+  componentAppVmMap.set(proxy, appVm);
+  if (exposeProxy && typeof exposeProxy === "object") {
+    componentAppVmMap.set(exposeProxy, appVm);
+  }
+  return exposeProxy || proxy;
 }
 function $destroyComponent(instance) {
-  if (!$destroyComponentFn) {
-    $destroyComponentFn = getAppVm().$destroyComponent;
+  const appVm = componentAppVmMap.get(instance) || getAppVm();
+  if (!$destroyComponentFn || $destroyComponentAppVm !== appVm) {
+    $destroyComponentAppVm = appVm;
+    $destroyComponentFn = appVm.$destroyComponent;
   }
-  return $destroyComponentFn(instance);
+  try {
+    return $destroyComponentFn(instance);
+  } finally {
+    componentAppVmMap.delete(instance);
+  }
+}
+function getComponentExposeProxy(proxy) {
+  return typeof getExposeProxy === "function" ? getExposeProxy(proxy.$) : void 0;
 }
 function parsePage(vueOptions, parseOptions2) {
   const { parse, mocks: mocks2, isPage: isPage2, initRelation: initRelation2, handleLink: handleLink2, initLifetimes: initLifetimes2 } = parseOptions2;
@@ -7858,12 +8105,17 @@ const createPage = initCreatePage(parseOptions);
 const createComponent = initCreateComponent(parseOptions);
 const createPluginApp = initCreatePluginApp();
 const createSubpackageApp = initCreateSubpackageApp();
+const createIndependentSubpackageApp = initCreateIndependentSubpackageApp();
+const isIndependentRuntime = typeof __UNI_MP_INDEPENDENT_RUNTIME__ !== "undefined" && __UNI_MP_INDEPENDENT_RUNTIME__ === true;
 {
-  wx.createApp = global.createApp = createApp;
-  wx.createPage = createPage;
-  wx.createComponent = createComponent;
-  wx.createPluginApp = global.createPluginApp = createPluginApp;
-  wx.createSubpackageApp = global.createSubpackageApp = createSubpackageApp;
+  if (!isIndependentRuntime) {
+    wx.createApp = global.createApp = createApp;
+    wx.createPage = createPage;
+    wx.createComponent = createComponent;
+    wx.createPluginApp = global.createPluginApp = createPluginApp;
+    wx.createSubpackageApp = global.createSubpackageApp = createSubpackageApp;
+    wx.createIndependentSubpackageApp = global.createIndependentSubpackageApp = createIndependentSubpackageApp;
+  }
 }
 exports._export_sfc = _export_sfc;
 exports.createSSRApp = createSSRApp;

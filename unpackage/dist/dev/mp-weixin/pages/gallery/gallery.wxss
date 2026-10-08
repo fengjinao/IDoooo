@@ -1,4 +1,3 @@
-
 .container.data-v-ff88f784 {
 		min-height: 100vh;
 		background: linear-gradient(180deg, #FFF5F5 0%, #FFE5E5 100%);
@@ -58,6 +57,11 @@
 }
 .placeholder-text.data-v-ff88f784 {
 		font-size: 80rpx;
+}
+.photo.data-v-ff88f784 {
+		width: 100%;
+		height: 100%;
+		display: block;
 }
 .image-desc.data-v-ff88f784 {
 		padding: 24rpx 20rpx;

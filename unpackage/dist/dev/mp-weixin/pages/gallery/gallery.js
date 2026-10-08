@@ -10,6 +10,7 @@ const _sfc_main = {
         },
         {
           emoji: "💑",
+          image: "/static/1.png",
           desc: "第一次约会"
         },
         {
@@ -97,6 +98,19 @@ const _sfc_main = {
     });
     this.initWaterfall();
   },
+  onShareAppMessage() {
+    return {
+      title: "我们的婚礼，诚邀您见证幸福时刻",
+      path: "/pages/index/index",
+      imageUrl: "/static/1.png"
+    };
+  },
+  onShareTimeline() {
+    return {
+      title: "我们的婚礼，诚邀您见证幸福时刻",
+      imageUrl: "/static/1.png"
+    };
+  },
   methods: {
     initWaterfall() {
       const processedList = this.galleryList.map((item, index) => {
@@ -121,6 +135,15 @@ const _sfc_main = {
       });
     },
     previewImage(id) {
+      const allItems = [...this.waterfallColumns[0], ...this.waterfallColumns[1]];
+      const item = allItems.find((i) => i.id === id);
+      if (item && item.image) {
+        common_vendor.index.previewImage({
+          current: item.image,
+          urls: allItems.filter((i) => i.image).map((i) => i.image)
+        });
+        return;
+      }
       common_vendor.index.showToast({
         title: "点击了第" + (id + 1) + "张照片",
         icon: "none"
@@ -134,15 +157,20 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       return {
         a: common_vendor.f(column, (item, index, i1) => {
           return common_vendor.e({
-            a: common_vendor.t(item.emoji || "📸"),
-            b: item.imageHeight + "rpx",
-            c: item.desc
+            a: item.image
+          }, item.image ? {
+            b: item.image
+          } : {
+            c: common_vendor.t(item.emoji || "📸")
+          }, {
+            d: item.imageHeight + "rpx",
+            e: item.desc
           }, item.desc ? {
-            d: common_vendor.t(item.desc)
+            f: common_vendor.t(item.desc)
           } : {}, {
-            e: item.id,
-            f: item.height + "rpx",
-            g: common_vendor.o(($event) => $options.previewImage(item.id), item.id)
+            g: item.id,
+            h: item.height + "rpx",
+            i: common_vendor.o(($event) => $options.previewImage(item.id), item.id)
           });
         }),
         b: colIndex
@@ -151,5 +179,6 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   };
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-ff88f784"]]);
+_sfc_main.__runtimeHooks = 6;
 wx.createPage(MiniProgramPage);
 //# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/gallery/gallery.js.map
